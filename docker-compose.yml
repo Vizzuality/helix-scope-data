@@ -1,7 +1,7 @@
 version: '2'
 services:
   develop:
-    image: guizar/data-sci-notebooks:latest
+    image: ecornejo/jupyter:testing
     build: .
     container_name: helixscope-datasci-notebook
     command: start-notebook.sh --NotebookApp.token=''

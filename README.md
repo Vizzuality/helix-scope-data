@@ -1,4 +1,4 @@
-# Helix-scope Analysis
+# Helix-scope data analysis
 
 This project is intended to support the data processing component of Vizzuality’s [HELIX project](https://github.com/Vizzuality/helix-scope)
 

@@ -1,9 +1,9 @@
 version: '2'
 services:
   develop:
-    image: ecornejo/jupyter:testing
+    image: guizar/data-sci-notebooks:latest
     build: .
-    container_name: viz-notebook
+    container_name: helixscope-datasci-notebook
     command: start-notebook.sh --NotebookApp.token=''
     ports:
       - "8888:8888"

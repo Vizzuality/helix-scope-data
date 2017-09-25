@@ -3,15 +3,15 @@ import os
 import re
 import fiona
 import rasterio
-import cartoframes
+#import cartoframes
 from rasterio.mask import mask
 from rasterio.plot import show
 from rasterstats import zonal_stats
 import geopandas as gpd
 import pandas as pd
 import numpy as np
-from matplotlib.pyplot import cm
-import matplotlib.pyplot as plt
+#from matplotlib.pyplot import cm
+#import matplotlib.pyplot as plt
 import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -72,7 +72,7 @@ def get_nc_attributes(filepath):
     return d
 
 
-def get_shape_attributes(i):
+def get_shape_attributes(i, shps):
     """Get attributes of shapes for gadm28_admin1 data
     index (i) should be passed
     """
@@ -81,7 +81,7 @@ def get_shape_attributes(i):
         try:
             d[table_attribute] = shps[table_attribute][i]
         except:
-            d[table_attribute] = None
+            pass
     return d
 
 
@@ -117,7 +117,8 @@ def process_file(file, shps, verbose=False, overwrite=False):
                                  affine=properties['transform'],
                                  no_data=np.nan)
             if zstats[0].get('count', 0) > 0:
-                shp_atts = get_shape_attributes(i)
+                shp_atts = get_shape_attributes(i, shps=shps)
+                #print("SHP_ATTS:",shp_atts)
                 tmp_d = {**zstats[0], **shp_atts, **tmp_metadata}
                 stats_per_file.append([tmp_d.get(key, None) for key in keys])
         df = pd.DataFrame(stats_per_file, columns=keys)

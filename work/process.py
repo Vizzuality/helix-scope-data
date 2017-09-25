@@ -2,6 +2,7 @@ import helix_funcs
 from multiprocessing import Process,Pool,cpu_count
 import time
 import math
+import geopandas as gpd
 import glob
 
 def chunks(l, n):
@@ -14,7 +15,6 @@ s = s.to_crs(epsg='4326')
 d = helix_funcs.identify_netcdf_and_csv_files()
 fs = d.get('nc')  # Simply break this list by the number of avilable processors
 
-
 if __name__ == "__main__":
     start = time.time()
     processes= [Process(target=helix_funcs.process_file, args=(f, s)) for f in fs]
@@ -24,3 +24,9 @@ if __name__ == "__main__":
         [p.join() for p in process_chunk]
     fin_time = time.time()
     print("\nFinished processing in {0:6.2f} min.".format((fin_time-start)/60.))
+
+# Single run to test all is working as it should be before parallelising
+# if __name__ == "__main__":
+#     for f in fs[0:1]:
+#         helix_funcs.process_file(f, s)
+#         print('Test Success!')

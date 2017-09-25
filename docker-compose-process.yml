@@ -4,7 +4,7 @@ services:
     image: ecornejo/jupyter:testing
     build: .
     container_name: helixscope-datasci-notebook
-    command: echo 'command goes here'
+    command: ipython process.py
     ports:
       - "8888:8888"
     volumes:

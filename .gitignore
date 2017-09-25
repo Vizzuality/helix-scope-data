@@ -11,4 +11,6 @@ Untitled.ipynb
 .env
 __pycache__
 master_admin1.csv
-/processed
+processed/
+testmulti/
+multi_process_test.ipynb

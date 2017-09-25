@@ -4,3 +4,4 @@ rasterstats==0.12.0
 pprintpp
 folium==0.3.0
 requests==2.18.4
+cartoframes

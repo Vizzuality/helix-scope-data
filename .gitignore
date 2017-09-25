@@ -8,3 +8,7 @@ Untitled.ipynb
 .ipynb_checkpoints
 .ipynb_checkpoints/
 .httr-oauth
+.env
+__pycache__
+master_admin1.csv
+/processed

@@ -1,0 +1,11 @@
+version: '2'
+services:
+  develop:
+    image: ecornejo/jupyter:testing
+    build: .
+    container_name: helixscope-datasci-notebook
+    command: echo 'command goes here'
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./work:/home/jovyan/work

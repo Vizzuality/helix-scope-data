@@ -36,8 +36,11 @@ def identify_netcdf_and_csv_files(path='data'):
 def generate_metadata(filepath):
     """Pass a path and file as a sigle string. Expected in the form of:
         data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc
+    Returns a dictionary of prepared metadata based on filename, path,
+    and netcdf attributes.
     """
-    file_metadata = get_nc_attributes(filepath)
+    tmp_metadata = get_nc_attributes(filepath)
+    file_metadata = prep_nc_attributes(tmp_metadata)
     filename_properties = extract_medata_from_filename(filepath)
     return {**file_metadata, **filename_properties}
 
@@ -51,14 +54,56 @@ def extract_medata_from_filename(filepath):
               'model_taxonomy': 'orchidee-giss-ecearth',
               'variable': 'cSoil'}
     """
-    stripped = filepath[6:] # Assume that the files are always in relative path  "data/"
+    stripped = filepath[6:] # Assume files are always in relative path  "data/"
     split_string = stripped.split('/')
     file_name = split_string[-1]
     variable = split_string[-2]
     model_taxonomy = file_name.split(".")[0]
     model_short_name = model_taxonomy.split("-")[0]
     model_short_name
-    return {'model_short_name':model_short_name, 'model_taxonomy':model_taxonomy, 'variable':variable}
+    return {'model_short_name':model_short_name,
+            'model_taxonomy':model_taxonomy,
+            'variable':variable}
+
+
+def prep_nc_attributes(d):
+    """
+    This should return an extracted and cleaned version of the raw netcdf atts.
+    It is this dictionary that should be used to create the summary table.
+    We can't assume that the raw netcdf attributes have been standardised
+    (i.e. correct case). We also cant assume that the flag attributes are
+    present. (They should be in the resulting table.)
+    """
+    sanitized = {}
+    for key in d:
+        if key.lower() == 'is_multi_model_summary':
+            # This is the pattern to convert to a boolean
+            sanitized['is_multi_model_summary'] = d.get(key).capitalize() == 'True'
+        if key.lower() == 'is_seasonal':
+            sanitized['is_seasonal'] = d.get(key).capitalize() == 'True'
+        if key.lower() == 'is_monthly':
+            sanitized['is_monthly'] = d.get(key).capitalize() == 'True'
+        if key.lower() == 'impact_tag':
+            # If we need to have a value in the table:
+            sanitized['impact_tag'] = d.get(key).strip()
+        if key.lower() == 'season':
+            sanitized['season'] = d.get(key).strip()
+        if key.lower() == 'month':
+            sanitized['month'] = d.get(key).strip()
+        if key.lower() == 'swl_info':
+            sanitized['swl_info'] = float(d.get(key, None))
+        if key.lower() == 'institution':
+            sanitized['institution'] = d.get(key).strip()
+        if key.lower() == 'model_long_name':
+            sanitized['model_long_name'] = d.get(key).strip()
+        # For keys of flags have not been included, ensure a False value appears
+        if not sanitized.get('is_seasonal', None):
+            sanitized['is_seasonal'] = False
+        if not sanitized.get('is_monthly', None):
+            sanitized['is_monthly'] = False
+        if not sanitized.get('is_multi_model_summary', None):
+            sanitized['is_multi_model_summary'] = False
+    return sanitized
 
 
 def get_nc_attributes(filepath):
@@ -66,15 +111,13 @@ def get_nc_attributes(filepath):
     we will access it using netCDF4.ncattrs function.
     Example:
     ncAttributes('data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc')
+    This should be returned un-mutated from this function
     """
     nc_file = Dataset(filepath, 'r')
     d = {}
     nc_attrs = nc_file.ncattrs()
     for nc_attr in nc_attrs:
         d.update({nc_attr: nc_file.getncattr(nc_attr)})
-    could_be_true = ['true', 'True', 'TRUE']
-    d['is_multi_model_summary'] = d['is_multi_model_summary'] in could_be_true
-    d['is_seasonal'] = d['is_seasonal'] in could_be_true
     return d
 
 
@@ -101,14 +144,15 @@ def process_file(file, shps, verbose=False, overwrite=False):
     if os.path.isfile(output_filename) and not overwrite:
 
         if verbose: print("{0} output exists.".format(output_filename))
-        if verbose: print("   Specifcy overwrite=True on process_file() function call if you want to replace it.")
+        if verbose: print("   Specifcy overwrite=True to replace it.")
         return
     else:
         if verbose: print("Processing '{}'".format(file))
-        keys = ['name_0','iso','id_1','name_1','engtype_1','variable','SWL_info',
+        keys =['name_0','iso','id_1','name_1','engtype_1','variable','swl_info',
                 'count', 'max','min','mean','std','impact_tag','institution',
                 'model_long_name','model_short_name','model_taxonomy',
-                'is_multi_model_summary','is_seasonal']
+                'is_multi_model_summary','is_seasonal','season','is_monthly',
+                'month']
         tmp_metadata = generate_metadata(file)
         with rasterio.open(file) as nc_file:
             rast=nc_file.read()
@@ -119,7 +163,8 @@ def process_file(file, shps, verbose=False, overwrite=False):
         stats_per_file = []
         for i in shps.index:
             shp = shps.iloc[i].geometry
-            zstats = zonal_stats(shp, tmp, band=1, stats=['mean', 'max','min','std','count'],
+            zstats = zonal_stats(shp, tmp, band=1,
+                                 stats=['mean', 'max','min','std','count'],
                                  all_touched=True, raster_out=False,
                                  affine=properties['transform'],
                                  no_data=np.nan)
@@ -136,7 +181,8 @@ def process_file(file, shps, verbose=False, overwrite=False):
         return
 
 
-def combine_processed_results(path='./processed', table_name="./master_admin1.csv"):
+def combine_processed_results(path='./processed',
+                              table_name="./master_admin1.csv"):
     """Combine all the csv files in the path (e.g. all processed files)
     into a single master table
     """
@@ -144,8 +190,8 @@ def combine_processed_results(path='./processed', table_name="./master_admin1.cs
     frames = [pd.read_csv(csv_file) for csv_file in output_files['csv']]
     master_table = pd.concat(frames)
     master_table.to_csv(table_name, index=False)
-    print("Generated {0}: {1:,g} rows of data from {2:,g} sources.".format(table_name,
-                                                            len(master_table),
-                                                            len(output_files['csv'])
-                                                            ))
+    print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,
+                                                        len(master_table),
+                                                        len(output_files['csv'])
+                                                                 ))
     return

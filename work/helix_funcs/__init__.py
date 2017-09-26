@@ -1,6 +1,6 @@
 from netCDF4 import Dataset
 import os
-import re
+#import re
 import fiona
 import rasterio
 #import cartoframes
@@ -10,8 +10,6 @@ from rasterstats import zonal_stats
 import geopandas as gpd
 import pandas as pd
 import numpy as np
-#from matplotlib.pyplot import cm
-#import matplotlib.pyplot as plt
 import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -20,7 +18,8 @@ warnings.filterwarnings('ignore')
 def identify_netcdf_and_csv_files(path='data'):
     """Crawl through a specified folder and return a dict of the netcdf d['nc']
     and csv d['csv'] files contained within.
-    Returns something like {'nc':'data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc'}
+    Returns something like
+    {'nc':'data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc'}
     """
     netcdf_files = []
     csv_files = []
@@ -44,21 +43,29 @@ def generate_metadata(filepath):
 
 
 def extract_medata_from_filename(filepath):
-    """extract additonal data from filename using REGEX"""
-    warning = "Filepath should resemble: data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
-    assert len(filepath.split('/')) == 4, warning
-    fname = filepath.split("/")[3]
-    variable = filepath.split("/")[2]
-    model_taxonomy = re.search('(^.*?)\.',fname, re.IGNORECASE).group(1)
-    model_short_name = re.search('(^.*?)-',model_taxonomy, re.IGNORECASE).group(1)
-    return {"model_short_name":model_short_name, "variable":variable, "model_taxonomy":model_taxonomy}
+    """Given a filepath that starts in a relative path of 'data/'
+     extract model metadta from the filename.
+     e.g. data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc
+     yields:
+             {'model_short_name': 'orchidee',
+              'model_taxonomy': 'orchidee-giss-ecearth',
+              'variable': 'cSoil'}
+    """
+    stripped = filepath[6:] # Assume that the files are always in relative path  "data/"
+    split_string = stripped.split('/')
+    file_name = split_string[-1]
+    variable = split_string[-2]
+    model_taxonomy = file_name.split(".")[0]
+    model_short_name = model_taxonomy.split("-")[0]
+    model_short_name
+    return {'model_short_name':model_short_name, 'model_taxonomy':model_taxonomy, 'variable':variable}
 
 
 def get_nc_attributes(filepath):
     """ Most info is stored in the files’ global attribute description,
     we will access it using netCDF4.ncattrs function.
     Example:
-         ncAttributes('data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc')
+    ncAttributes('data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc')
     """
     nc_file = Dataset(filepath, 'r')
     d = {}
@@ -68,7 +75,6 @@ def get_nc_attributes(filepath):
     could_be_true = ['true', 'True', 'TRUE']
     d['is_multi_model_summary'] = d['is_multi_model_summary'] in could_be_true
     d['is_seasonal'] = d['is_seasonal'] in could_be_true
-    del d['contact']
     return d
 
 
@@ -88,7 +94,8 @@ def get_shape_attributes(i, shps):
 def process_file(file, shps, verbose=False, overwrite=False):
     """Given a single file, generate a csv table with the same folder/file name
     in ./data/processed/ with all required csv info.
-    Expect file to be a string e.g.: "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
+    Expect file to be a string e.g.:
+    "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
     """
     output_filename = "".join(['./processed/',file[5:-3],'.csv'])
     if os.path.isfile(output_filename) and not overwrite:

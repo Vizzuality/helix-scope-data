@@ -24,4 +24,83 @@ This will recursively search through all `.nc` files in your `./data` directory.
 
 After the processing is complete, you will have populated the `./work/processed/` folder with csv tables. These can be combined into a final table by running the function `helix_funcs.combine_processed_result()`
 
+Note, if you re-run this program, by default the program will not overwrite existing data. Therefore you can also partially run this program, and resume it later, or simply update the datasets contained in the `./data` folder and run the program again to create a complete archive of processed files in `./processed`.
+
+
+#### Processed files
+
+The processed files should maintain an identical folder structure to that contained in the `./work/data/` folder. E.g.:
+
+```bash
+.
+├── CNRS_data
+│   ├── cSoil
+│   │   ├── orchidee-giss-ecearth.SWL_15.eco.cSoil.csv
+│   │   ├── orchidee-giss-ecearth.SWL_2.eco.cSoil.csv
+│   │   ├── orchidee-giss-ecearth.SWL_4.eco.cSoil.csv
+│   │   ├── orchidee-ipsl-ecearth.SWL_15.eco.cSoil.csv
+│   │   ├── orchidee-ipsl-ecearth.SWL_2.eco.cSoil.csv
+│   │   ├── orchidee-ipsl-ecearth.SWL_4.eco.cSoil.csv
+│   │   ├── orchidee-ipsl-hadgem.SWL_15.eco.cSoil.csv
+│   │   ├── orchidee-ipsl-hadgem.SWL_2.eco.cSoil.csv
+│   │   └── orchidee-ipsl-hadgem.SWL_4.eco.cSoil.csv
+│   └── cVeg
+│       ├── orchidee-giss-ecearth.SWL_15.eco.cVeg.csv
+│       ├── orchidee-giss-ecearth.SWL_2.eco.cVeg.csv
+│       ├── orchidee-giss-ecearth.SWL_4.eco.cVeg.csv
+│       ├── orchidee-ipsl-ecearth.SWL_15.eco.cVeg.csv
+│       ├── orchidee-ipsl-ecearth.SWL_2.eco.cVeg.csv
+│       ├── orchidee-ipsl-ecearth.SWL_4.eco.cVeg.csv
+│       ├── orchidee-ipsl-hadgem.SWL_15.eco.cVeg.csv
+│       ├── orchidee-ipsl-hadgem.SWL_2.eco.cVeg.csv
+│       └── orchidee-ipsl-hadgem.SWL_4.eco.cVeg.csv
+└── UEA_data
+    └── climate
+        └── pr
+            └── ECEARTH-R1.SWL_15.cl.pr.Apr.csv
+```
+
+The contents of the files should be as follows (e.g. `./work/processed/UEA_data/climate/pr/ECEARTH-R1.SWL_15.cl.pr.Apr.csv`):
+
+```csv
+name_0,iso,id_1,name_1,engtype_1,variable,swl_info,count,max,min,mean,std,impact_tag,institution,model_long_name,model_short_name,model_taxonomy,is_multi_model_summary,is_seasonal,season,is_monthly,month
+Mexico,MEX,9,Ciudad de México,Federal District,pr,1.5,3,30.899574279785156,18.50608253479004,23.930439631144207,5.176189890440805,cl,,ECEARTH-R1,ECEARTH,ECEARTH-R1,False,False,,True,Apr
+Haiti,HTI,3,L'Artibonite,Department,pr,1.5,7,162.45266723632812,35.2036247253418,93.23222242082868,41.52149089980079,cl,,ECEARTH-R1,ECEARTH,ECEARTH-R1,False,False,,True,Apr
+```
+
+The seperate outputs can be combined by calling a function from `helix_funcs`:
+
+```python
+import helix_funcs
+helix_funcs.combine_processed_results('./work/processed'
+```
+
+### Variables in output
+
+|variable_name| type| Description|
+|-------------|-----|------------|
+|name_0| STR| Name of country |
+|iso| STR| 3 character country iso code |
+|id_1 | INT | ID number of Admin1 area |
+|name_1| STR | Name of Admin 1 area |
+| engtype_1 | STR | Kind of area |
+|variable| STR| variable name |
+|swl_info| FLOAT | Specific warming level |
+|count| INT | Number of pixels intersecting geometry |
+|max| FLOAT | Maximum pixel value intersecting geometry |
+|min| FLOAT | Minimum pixel value intersecting geometry |
+|mean| FLOAT | Average pixel value intersecting geometry| 
+|std| FLOAT | Standard Sample Deviation of pixels intersecting geometry|
+|impact_tag| STR | code to indicate what impacts variable relates to |
+|institution| STR | Institute name |
+|model_long_name| STR | Model long name |
+|model_short_name| STR | Model Short name |
+|model_taxonomy| STR | Model taxonomy |
+|is_multi_model_summary| BOOL | Flag to indicate if it is a summary of models |
+|is_seasonal| BOOL | Flag to indicate if data are seasonal |
+|season| STR | Characters to indicate the month grouping e.g. 'SON','DFJ'|
+|is_monthly| BOOL | Flag to indicate if the data relate to one month only |
+|month| STR | Calander month, e.g. `Apr`|
+
+
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Vizzuality/sql2gee/blob/develop/LICENSE)

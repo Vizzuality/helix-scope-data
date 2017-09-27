@@ -185,10 +185,12 @@ def process_file(file, shps, verbose=False, overwrite=False):
 def combine_processed_results(path='./processed',
                               table_name="./master_admin1.csv"):
     """Combine all the csv files in the path (e.g. all processed files)
-    into a single master table
+    into a single master table.
+    NOTE: at this point we use a round function to leave only 1 sig fig of data.
+    That is done during pd.read_csv().round(1)
     """
     output_files = identify_netcdf_and_csv_files(path)
-    frames = [pd.read_csv(csv_file) for csv_file in output_files['csv']]
+    frames = [pd.read_csv(csv_file).round(1) for csv_file in output_files['csv']]
     master_table = pd.concat(frames)
     master_table.to_csv(table_name, index=False)
     print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,

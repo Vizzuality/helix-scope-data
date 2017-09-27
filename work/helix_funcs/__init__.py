@@ -4,7 +4,7 @@ import os
 import fiona
 import rasterio
 #import cartoframes
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt # deactivating this for processing due to issue with PyQt4 in docker
 from rasterio.mask import mask
 from rasterio.plot import show
 from rasterstats import zonal_stats

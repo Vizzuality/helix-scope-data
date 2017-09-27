@@ -15,7 +15,7 @@ def chunks(l, n):
 #                                                   0 above for admin-0 ^
 
 # SIMPLIFIED SHAPES FOR ADMIN 0 LEVEL
-s = gpd.read_file("./data/gadm28_adm1_simplified/gadm28_adm0_simplified.shp")
+s = gpd.read_file("./data/gadm28_adm0_simplified/gadm28_adm0_simplified.shp")
 # SIMPLIFIED SHAPES FOR ADMIN 1 LEVEL
 #s = gpd.read_file("./data/gadm28_adm1_simplified/gadm28_adm1_simplified.shp")
 

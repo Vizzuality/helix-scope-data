@@ -5,3 +5,4 @@ pprintpp
 folium==0.3.0
 requests==2.18.4
 cartoframes
+iso3166

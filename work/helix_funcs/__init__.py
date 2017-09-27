@@ -4,6 +4,7 @@ import os
 import fiona
 import rasterio
 #import cartoframes
+import matplotlib.pyplot as plt
 from rasterio.mask import mask
 from rasterio.plot import show
 from rasterstats import zonal_stats
@@ -195,3 +196,38 @@ def combine_processed_results(path='./processed',
                                                         len(output_files['csv'])
                                                                  ))
     return
+
+
+def map_file_by_iso(f, s, iso="ESP", var='mean'):
+    """Read a processed CSV (expecting admin1 level) and produce a
+    sample choropleth plot to check how the data processing went.
+    f is filepath e.g. 'processed/CNRS_data/cSoil/orchidee-ipsl-hadgem.SWL_2.eco.cSoil.csv'
+    s are loaded geopandas dataframe e.g: s = gpd.read_file('./data/gadm28_adm1/gadm28_adm1.shp')
+    """
+    f_split = f.split('/')
+    f_split
+    title = " ".join([iso,":",f_split[-1].split('.csv')[0]])
+    df = pd.read_csv(f)
+    country_subset = df['iso'] == iso
+    keys = ['iso', 'id_1', var]
+    country_subset = df['iso'] == iso
+    extrated_data = []
+    for row in df[country_subset].index:
+        extrated_data.append([df[k][row] for k in keys])
+    tmp_df = pd.DataFrame(extrated_data, columns = keys)
+    s_smaller = s[s['iso'] == iso]
+    geoms = []
+    for row in tmp_df.index:
+        s_smaller_mask = tmp_df['id_1'][row] == s_smaller['id_1']
+        geoms.append(s_smaller[s_smaller_mask].geometry.values[0])#.simplify(0.01))
+    map_data = gpd.GeoDataFrame(tmp_df, geometry=geoms)
+    # Plotting section
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    s_smaller.plot(ax=ax, color='red', linewidth=0.5) # Basemap of all country shapes (red polygons)
+    map_data.plot(ax=ax, column='mean',cmap='Pastel1', alpha=1.0, linewidth=0.5)  # All shapes for where there exist data (colored polygons)
+    plt.title(title)
+    outfname = "".join(["./",iso,".",f_split[-1].split('.csv')[0],'.png'])
+    plt.savefig(outfname, dpi=300)
+    print("Written {0}".format(outfname))
+    return tmp_df

@@ -122,12 +122,18 @@ def get_nc_attributes(filepath):
     return d
 
 
-def get_shape_attributes(i, shps):
+def get_shape_attributes(i, shps, admin_level):
     """Get attributes of shapes for gadm28_admin1 data
     index (i) should be passed
     """
     d = {}
-    for table_attribute in ['iso','name_0','id_1','name_1','engtype_1']:
+    if admin_level == 0:
+        keys = ['iso','name_0']
+    elif admin_level == 1:
+        keys = ['iso','name_0','id_1','name_1','engtype_1']
+    else:
+        raise ValueError("Admin level should be set to 0 or 1")
+    for table_attribute in keys:
         try:
             d[table_attribute] = shps[table_attribute][i]
         except:
@@ -135,13 +141,24 @@ def get_shape_attributes(i, shps):
     return d
 
 
-def process_file(file, shps, verbose=False, overwrite=False):
+def process_file(file, shps, admin_level, verbose=False, overwrite=False):
     """Given a single file, generate a csv table with the same folder/file name
     in ./data/processed/ with all required csv info.
+    The admin level with which to process the file should be specified.
     Expect file to be a string e.g.:
     "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
+    Note: admin0 tables should have aggregated stats, while admin1 tables should
+    only contain means.
     """
-    output_filename = "".join(['./processed/',file[5:-3],'.csv'])
+    if admin_level == 0:
+        admin_prefix = 'admin0/'
+        if verbose: print('working on ', admin_prefix)
+    elif admin_level == 1:
+        admin_prefix = 'admin1/'
+        if verbose: print('working on ',admin_prefix)
+    else:
+        raise ValueError("admin_level kwarg must be either 0 or 1")
+    output_filename = "".join(['./processed/',admin_prefix,file[5:-3],'.csv'])
     if os.path.isfile(output_filename) and not overwrite:
 
         if verbose: print("{0} output exists.".format(output_filename))
@@ -149,11 +166,22 @@ def process_file(file, shps, verbose=False, overwrite=False):
         return
     else:
         if verbose: print("Processing '{}'".format(file))
-        keys =['name_0','iso','id_1','name_1','engtype_1','variable','swl_info',
-                'count', 'max','min','mean','std','impact_tag','institution',
-                'model_long_name','model_short_name','model_taxonomy',
-                'is_multi_model_summary','is_seasonal','season','is_monthly',
-                'month']
+        if admin_level==0:
+            keys =['name_0','iso','variable','swl_info',
+                    'count', 'max','min','mean','std','impact_tag','institution',
+                    'model_long_name','model_short_name','model_taxonomy',
+                    'is_multi_model_summary','is_seasonal','season','is_monthly',
+                    'month']
+            stats_to_get=['mean', 'max','min','std','count']
+        elif admin_level==1:
+            keys =['name_0','iso','id_1','name_1','engtype_1','variable','swl_info',
+                    'mean','impact_tag','institution',
+                    'model_long_name','model_short_name','model_taxonomy',
+                    'is_multi_model_summary','is_seasonal','season','is_monthly',
+                    'month']
+            stats_to_get = ['mean', 'count']
+        else:
+            raise ValueError('Admin_level should be 0 or 1')
         tmp_metadata = generate_metadata(file)
         with rasterio.open(file) as nc_file:
             rast=nc_file.read()
@@ -165,13 +193,12 @@ def process_file(file, shps, verbose=False, overwrite=False):
         for i in shps.index:
             shp = shps.iloc[i].geometry
             zstats = zonal_stats(shp, tmp, band=1,
-                                 stats=['mean', 'max','min','std','count'],
+                                 stats=stats_to_get,
                                  all_touched=True, raster_out=False,
                                  affine=properties['transform'],
                                  no_data=np.nan)
             if zstats[0].get('count', 0) > 0:
-                shp_atts = get_shape_attributes(i, shps=shps)
-                #print("SHP_ATTS:",shp_atts)
+                shp_atts = get_shape_attributes(i, shps=shps, admin_level=admin_level)
                 tmp_d = {**zstats[0], **shp_atts, **tmp_metadata}
                 stats_per_file.append([tmp_d.get(key, None) for key in keys])
         df = pd.DataFrame(stats_per_file, columns=keys)
@@ -182,7 +209,7 @@ def process_file(file, shps, verbose=False, overwrite=False):
         return
 
 
-def combine_processed_results(path='./processed',
+def combine_processed_results(path='./processed/admin1/',
                               table_name="./master_admin1.csv"):
     """Combine all the csv files in the path (e.g. all processed files)
     into a single master table.
@@ -205,6 +232,7 @@ def map_file_by_iso(f, s, iso="ESP", var='mean'):
     sample choropleth plot to check how the data processing went.
     f is filepath e.g. 'processed/CNRS_data/cSoil/orchidee-ipsl-hadgem.SWL_2.eco.cSoil.csv'
     s are loaded geopandas dataframe e.g: s = gpd.read_file('./data/gadm28_adm1/gadm28_adm1.shp')
+    The shapes should, in this case, not be simplified shapes.
     """
     f_split = f.split('/')
     f_split

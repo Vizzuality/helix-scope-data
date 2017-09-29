@@ -2,6 +2,7 @@ from netCDF4 import Dataset
 import os
 #import re
 import fiona
+import re
 import rasterio
 #import cartoframes
 #import matplotlib.pyplot as plt # deactivating this for processing due to issue with PyQt4 in docker
@@ -209,8 +210,21 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False):
         return
 
 
-def combine_processed_results(path='./processed/admin1/',
-                              table_name="./master_admin1.csv"):
+def identify_run(element):
+    """Helper function to check for the presence of a regular expression r[1-9]
+    to indicate the model run. If its found, it should be returned, if not, it
+    should throw a None.
+    """
+    regex = r"r[0-9]+"
+    try:
+        match = re.search(regex, element)
+        found = match.group()
+        return int(found.split('r')[-1])
+    except:
+        return None
+
+def combine_processed_results(path='./processed/admin0/',
+                              table_name="./master_admin0.csv"):
     """Combine all the csv files in the path (e.g. all processed files)
     into a single master table.
     NOTE: at this point we use a round function to leave only 1 sig fig of data.
@@ -219,6 +233,21 @@ def combine_processed_results(path='./processed/admin1/',
     output_files = identify_netcdf_and_csv_files(path)
     frames = [pd.read_csv(csv_file).round(1) for csv_file in output_files['csv']]
     master_table = pd.concat(frames)
+    taxonomy = master_table['model_taxonomy']
+    new_taxa_column = []
+    run_column = []
+    for taxa in taxonomy:
+        split_taxa = taxa.split('-')
+        last_element = split_taxa[-1].lower()
+        run_info = identify_run(last_element)
+        if run_info:
+            new_taxa_column.append(''.join(split_taxa[:-1]))
+            run_column.append(run_info)
+        else:
+            new_taxa_column.append(taxa)
+            run_column.append(1)
+    master_table['model_taxonomy'] = new_taxa_column
+    master_table['run'] =  run_column
     master_table.to_csv(table_name, index=False)
     print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,
                                                         len(master_table),

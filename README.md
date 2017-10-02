@@ -1,5 +1,8 @@
 # Helix-scope data analysis
 
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Vizzuality/sql2gee/blob/develop/LICENSE)
+
+
 This repo is the data processing component of Vizzuality’s [HELIX project](https://github.com/Vizzuality/helix-scope)
 
 The data science environment and tools are based on Vizzuality's Data Science [Jupyter Notebooks](https://github.com/Vizzuality/data_sci_tutorials)
@@ -68,7 +71,10 @@ Mexico,MEX,9,Ciudad de México,Federal District,pr,1.5,3,30.899574279785156,18.5
 Haiti,HTI,3,L'Artibonite,Department,pr,1.5,7,162.45266723632812,35.2036247253418,93.23222242082868,41.52149089980079,cl,,ECEARTH-R1,ECEARTH,ECEARTH-R1,False,False,,True,Apr
 ```
 
-The seperate outputs can be combined by calling a function from `helix_funcs`:
+The separate outputs can be combined by calling a function from `helix_funcs`. It is at this
+point that the data values are modified if necessary, leaving the processed files untouched.
+E.g. we reduce the number of significant digits at this stage, so that in the master
+output file values are to 1-sig. fig. only:
 
 ```python
 import helix_funcs
@@ -89,7 +95,7 @@ helix_funcs.combine_processed_results('./work/processed'
 |count| INT | Number of pixels intersecting geometry |
 |max| FLOAT | Maximum pixel value intersecting geometry |
 |min| FLOAT | Minimum pixel value intersecting geometry |
-|mean| FLOAT | Average pixel value intersecting geometry| 
+|mean| FLOAT | Average pixel value intersecting geometry|
 |std| FLOAT | Standard Sample Deviation of pixels intersecting geometry|
 |impact_tag| STR | code to indicate what impacts variable relates to |
 |institution| STR | Institute name |
@@ -103,4 +109,20 @@ helix_funcs.combine_processed_results('./work/processed'
 |month| STR | Calander month, e.g. `Apr`|
 
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Vizzuality/sql2gee/blob/develop/LICENSE)
+
+## Data sources
+
+Unfortunately, this project mixes data from a variety of sources. The majority of
+the data are netcdf format, however we also have csv files (e.g. UEA for agriculture)
+and Excel workbooks (population data). We will need to process all of these data sources
+and create a standardised output (one that shares the same structure) prior to generating
+complete master tables for the backend.
+
+### Excel
+
+Before working with the excel files, should first be opened and `save as` a `.csv`
+file.
+
+Warning:
+* These files mix zeros and NA values.
+* They have inconsistent column names between files.        

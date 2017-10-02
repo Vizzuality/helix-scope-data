@@ -143,8 +143,8 @@ def get_shape_attributes(i, shps, admin_level):
 
 
 def process_file(file, shps, admin_level, verbose=False, overwrite=False):
-    """Given a single file, generate a csv table with the same folder/file name
-    in ./data/processed/ with all required csv info.
+    """Given a single NETCDF file, generate a csv table with the same folder/file
+    name in ./data/processed/ with all required csv info.
     The admin level with which to process the file should be specified.
     Expect file to be a string e.g.:
     "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"

@@ -12,6 +12,7 @@ from rasterstats import zonal_stats
 import geopandas as gpd
 import pandas as pd
 import numpy as np
+from iso3166 import countries
 import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -59,7 +60,7 @@ def extract_medata_from_filename(filepath):
     stripped = filepath[6:] # Assume files are always in relative path  "data/"
     split_string = stripped.split('/')
     file_name = split_string[-1]
-    variable = split_string[-2]
+    variable = split_string[-1].split('.')[-2] # comes from filename not folder
     model_taxonomy = file_name.split(".")[0]
     model_short_name = model_taxonomy.split("-")[0]
     model_short_name
@@ -226,12 +227,12 @@ def identify_run(element):
 def combine_processed_results(path='./processed/admin0/',
                               table_name="./master_admin0.csv"):
     """Combine all the csv files in the path (e.g. all processed files)
-    into a single master table.
+    into a single master table. Add in extra info too like 2character iso codes.
     NOTE: at this point we use a round function to leave only 1 sig fig of data.
     That is done during pd.read_csv().round(1)
     """
     output_files = identify_netcdf_and_csv_files(path)
-    frames = [pd.read_csv(csv_file).round(1) for csv_file in output_files['csv']]
+    frames = [pd.read_csv(csv_file).round(2) for csv_file in output_files['csv']]
     master_table = pd.concat(frames)
     taxonomy = master_table['model_taxonomy']
     new_taxa_column = []
@@ -248,6 +249,10 @@ def combine_processed_results(path='./processed/admin0/',
             run_column.append(1)
     master_table['model_taxonomy'] = new_taxa_column
     master_table['run'] =  run_column
+    iso2 = []
+    for ccode in master_table.iso:
+        iso2.append(countries.get(ccode).alpha2)
+    master_table['iso2'] = iso2
     master_table.to_csv(table_name, index=False)
     print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,
                                                         len(master_table),

@@ -57,7 +57,7 @@ def extract_medata_from_filename(filepath):
               'model_taxonomy': 'orchidee-giss-ecearth',
               'variable': 'cSoil'}
     """
-    stripped = filepath[6:] # Assume files are always in relative path  "data/"
+    stripped = filepath[5:] # Assume files are always in relative path  "data/"
     split_string = stripped.split('/')
     file_name = split_string[-1]
     # obtain var name from filename not folder path:
@@ -70,9 +70,15 @@ def extract_medata_from_filename(filepath):
     model_taxonomy = file_name.split(".")[0]
     model_short_name = model_taxonomy.split("-")[0]
     model_short_name
+    # Hack to insert instiution metadata for UCL files, as they unfortunatley
+    # left that metada field out of the netcdf files...
+    ugly_hack = {}
+    if split_string[0] == 'UEA_data':
+        ugly_hack['institution'] = "Tyndall Centre for Climate Change Research, University of East Anglia"
     return {'model_short_name':model_short_name,
             'model_taxonomy':model_taxonomy,
-            'variable':variable}
+            'variable':variable,
+            **ugly_hack}
 
 
 def prep_nc_attributes(d):
@@ -268,10 +274,10 @@ def combine_processed_results(path='./processed/admin0/',
             run_column.append(1)
     master_table['model_taxonomy'] = new_taxa_column
     master_table['run'] =  run_column
-    iso2 = []
-    for ccode in master_table.iso:
-        iso2.append(countries.get(ccode).alpha2)
-    master_table['iso2'] = iso2
+    # iso2 = []
+    # for ccode in master_table.iso:
+    #     iso2.append(countries.get(ccode).alpha2)
+    # master_table['iso2'] = iso2
     master_table.to_csv(table_name, index=False)
     print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,
                                                         len(master_table),

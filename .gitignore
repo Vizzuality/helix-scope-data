@@ -14,3 +14,4 @@ master_admin1.csv
 processed/
 testmulti/
 multi_process_test.ipynb
+*.png

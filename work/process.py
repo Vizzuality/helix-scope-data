@@ -14,8 +14,9 @@ def chunks(l, n):
 # e.g. processes= [Process(target=helix_funcs.process_file, args=(f, s, 0),
 #                                                   0 above for admin-0 ^
 
-# SIMPLIFIED SHAPES FOR ADMIN 0 LEVEL
-s = gpd.read_file("./data/gadm28_adm0_simplified/gadm28_adm0_simplified.shp")
+# ADMIN 0 LEVEL (unsimplifed country shapes)
+s = gpd.read_file('./data/gadm28_countries/gadm28_countries.shp')
+
 # SIMPLIFIED SHAPES FOR ADMIN 1 LEVEL
 #s = gpd.read_file("./data/gadm28_adm1_simplified/gadm28_adm1_simplified.shp")
 

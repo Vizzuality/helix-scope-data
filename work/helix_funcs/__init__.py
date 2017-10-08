@@ -60,7 +60,13 @@ def extract_medata_from_filename(filepath):
     stripped = filepath[6:] # Assume files are always in relative path  "data/"
     split_string = stripped.split('/')
     file_name = split_string[-1]
-    variable = split_string[-1].split('.')[-2] # comes from filename not folder
+    # obtain var name from filename not folder path:
+    seasons = ["MAM", "JJA", "SON", "DJF"]
+    possible_var = split_string[-1].split('.')[-2]
+    if possible_var.upper() in seasons:
+        variable = split_string[-1].split('.')[-3]
+    else:
+        variable = possible_var
     model_taxonomy = file_name.split(".")[0]
     model_short_name = model_taxonomy.split("-")[0]
     model_short_name
@@ -130,20 +136,24 @@ def get_shape_attributes(i, shps, admin_level):
     """
     d = {}
     if admin_level == 0:
-        keys = ['iso','name_0']
+        keys = ['iso', 'name_engli']
+        hack_d = {'iso':'iso', 'name_engli':'name_0'}
     elif admin_level == 1:
         keys = ['iso','name_0','id_1','name_1','engtype_1']
+        hack_d = {'iso':'iso', 'name_0':'name_0','id_1':'id_1',
+                  'name_1':'name_1','engtype_1':'engtype_1'}
     else:
         raise ValueError("Admin level should be set to 0 or 1")
     for table_attribute in keys:
         try:
-            d[table_attribute] = shps[table_attribute][i]
+            d[hack_d[table_attribute]] = shps[table_attribute][i]
         except:
             pass
     return d
 
 
-def process_file(file, shps, admin_level, verbose=False, overwrite=False):
+def process_file(file, shps, admin_level, verbose=False, overwrite=False,
+                 skip_monthly=True):
     """Given a single NETCDF file, generate a csv table with the same folder/file
     name in ./data/processed/ with all required csv info.
     The admin level with which to process the file should be specified.
@@ -152,6 +162,15 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False):
     Note: admin0 tables should have aggregated stats, while admin1 tables should
     only contain means.
     """
+    if skip_monthly:
+        suffix_item = file.split('/')[-1].split('.')[-2]
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        if suffix_item.title() in months:
+            warning = ('is monthly data. Skipping. '
+                        "To process set skip_monthly to False.")
+            if verbose: print(file, warning)
+            return None
     if admin_level == 0:
         admin_prefix = 'admin0/'
         if verbose: print('working on ', admin_prefix)

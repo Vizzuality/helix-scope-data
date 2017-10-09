@@ -26,7 +26,7 @@ fs = d.get('nc')  # Simply break this list by the number of avilable processors
 
 if __name__ == "__main__":
     start = time.time()
-    processes= [Process(target=helix_funcs.process_file, args=(f, s, 0), #<--set to 0 or 1 for admin level
+    processes= [Process(target=helix_funcs.process_file, args=(f, s, 'grids'), #<--set to 0 or 1 for admin level
                         kwargs={'verbose': True,}) for f in fs]
     for process_chunk in chunks(processes, cpu_count()):
         print('loop ', process_chunk, ' of ', cpu_count())

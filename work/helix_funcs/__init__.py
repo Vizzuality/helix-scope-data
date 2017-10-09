@@ -136,15 +136,20 @@ def get_nc_attributes(filepath):
     return d
 
 
-def get_shape_attributes(i, shps, admin_level):
+def get_shape_attributes(i, shps, shape_id):
     """Get attributes of shapes for gadm28_admin1 data
-    index (i) should be passed
+    index (i) should be passed.
+    shape_id should be an id string of the shape (e.g. 'grids',
+    'admin_0', 'admin_1')
     """
     d = {}
-    if admin_level == 0:
+    if shape_id = 'grids':
+        keys = ['id_val']
+        hack_d = {'shape_id': 'id_val'}
+    elif shape_id == 'admin_0':
         keys = ['iso', 'name_engli']
         hack_d = {'iso':'iso', 'name_engli':'name_0'}
-    elif admin_level == 1:
+    elif shape_id == 'admin_1':
         keys = ['iso','name_0','id_1','name_1','engtype_1']
         hack_d = {'iso':'iso', 'name_0':'name_0','id_1':'id_1',
                   'name_1':'name_1','engtype_1':'engtype_1'}
@@ -158,7 +163,7 @@ def get_shape_attributes(i, shps, admin_level):
     return d
 
 
-def process_file(file, shps, admin_level, verbose=False, overwrite=False,
+def process_file(file, shps, shape_id, verbose=False, overwrite=False,
                  skip_monthly=True):
     """Given a single NETCDF file, generate a csv table with the same folder/file
     name in ./data/processed/ with all required csv info.
@@ -167,7 +172,9 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False,
     "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
     Note: admin0 tables should have aggregated stats, while admin1 tables should
     only contain means.
+    shape_id can be 'admin_0', 'admin_1', or 'grids'
     """
+    valid_shapes = ['admin_0', 'admin_1', 'grids']
     if skip_monthly:
         suffix_item = file.split('/')[-1].split('.')[-2]
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -177,30 +184,39 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False,
                         "To process set skip_monthly to False.")
             if verbose: print(file, warning)
             return None
-    if admin_level == 0:
+    if shape_id == 'grids':
+        admin_prefix = 'grids/'
+        if verbose: print('working on ', admin_prefix)
+    elif shape_id == 'admin_0':
         admin_prefix = 'admin0/'
         if verbose: print('working on ', admin_prefix)
-    elif admin_level == 1:
+    elif shape_id == 'admin_1':
         admin_prefix = 'admin1/'
         if verbose: print('working on ',admin_prefix)
     else:
-        raise ValueError("admin_level kwarg must be either 0 or 1")
+        raise ValueError("shape_id kwarg must be one of", valid_shapes)
     output_filename = "".join(['./processed/',admin_prefix,file[5:-3],'.csv'])
     if os.path.isfile(output_filename) and not overwrite:
-
         if verbose: print("{0} output exists.".format(output_filename))
         if verbose: print("   Specifcy overwrite=True to replace it.")
         return
     else:
         if verbose: print("Processing '{}'".format(file))
-        if admin_level==0:
+        if shape_id == 'grids':
+            keys = ['shape_id', 'variable','swl_info','count', 'max','min',
+                    'mean','std','impact_tag','institution','model_long_name',
+                    'model_short_name','model_taxonomy',
+                    'is_multi_model_summary','is_seasonal','season',
+                    'is_monthly','month']
+            stats_to_get=['mean', 'max','min','std','count']
+        elif shape_id=='admin_0':
             keys =['name_0','iso','variable','swl_info',
                     'count', 'max','min','mean','std','impact_tag','institution',
                     'model_long_name','model_short_name','model_taxonomy',
                     'is_multi_model_summary','is_seasonal','season','is_monthly',
                     'month']
             stats_to_get=['mean', 'max','min','std','count']
-        elif admin_level==1:
+        elif shape_id=='admin_1':
             keys =['name_0','iso','id_1','name_1','engtype_1','variable','swl_info',
                     'mean','impact_tag','institution',
                     'model_long_name','model_short_name','model_taxonomy',
@@ -208,7 +224,7 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False,
                     'month']
             stats_to_get = ['mean', 'count']
         else:
-            raise ValueError('Admin_level should be 0 or 1')
+            raise ValueError('shape_id should be one of ', valid_shapes)
         tmp_metadata = generate_metadata(file)
         with rasterio.open(file) as nc_file:
             rast=nc_file.read()
@@ -225,7 +241,7 @@ def process_file(file, shps, admin_level, verbose=False, overwrite=False,
                                  affine=properties['transform'],
                                  no_data=np.nan)
             if zstats[0].get('count', 0) > 0:
-                shp_atts = get_shape_attributes(i, shps=shps, admin_level=admin_level)
+                shp_atts = get_shape_attributes(i, shps=shps, shape_id=shape_id)
                 tmp_d = {**zstats[0], **shp_atts, **tmp_metadata}
                 stats_per_file.append([tmp_d.get(key, None) for key in keys])
         df = pd.DataFrame(stats_per_file, columns=keys)

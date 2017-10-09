@@ -187,7 +187,7 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
     if skip_seasonal:
         season_values = ['SON', 'JJA', 'DJF', 'MAM']
         suffix_item = file.split('/')[-1].split('.')[-2]
-        if suffix_item.title() in season_values:
+        if suffix_item.upper() in season_values:
             warning = ('is seasonal data. Skipping '
                         'To process set skip_seasonal to False')
             if verbose: print(file, warning)

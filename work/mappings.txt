@@ -1,0 +1,88 @@
+
+Mapping between  {'varible_name': 'Human readable variable name'}
+(i.e. a short human-readable name that should appear in menus and titles).
+
+{
+'Maize_Irrigation_avoided_perc_change':'Maize yield change avoided by irrigation',
+'Maize_yield_perc_change':'Maize crop yield change',
+'Rice_Irrigation_avoided_perc_change':'Rice yield change avoided by irrigation',
+'Rice_yield_perc_change':'Rice crop yield change',
+'Soybeans_Irrigation_avoided_perc_change':'Soybeans yield change avoided by irrigation',
+'Soybeans_yield_perc_change':'Soybeans crop yield change',
+'Wheat_Irrigation_avoided_perc_change':'Wheat yield change avoided by irrigation',
+'Wheat_yield_perc_change':'Wheat crop yield change',
+'amphibianobiodiversity':'Amphibian species richness - no dispersal',
+'amphibiarealbiodiversity':'Amphibian species richness',
+'birdnobiodiversity':'Bird species richness - no dispersal',
+'birdrealbiodiversity':'Bird species richness',
+'cVeg':'Vegetation biomass',
+'gpp':'Gross primary productivity',
+'mammalnobiodiversity':'Mammalian species richness remaining - no dispersal',
+'mammalrealbiodiversity':'Mammalian species richness',
+'nbp':'Net Biome productivity',
+'perc_change_low_roff':'10th percentile runoff production',
+'perc_change_roff':'Runoff production',
+'pr':'Precipitation',
+'reptilenobiodiversity':'Reptile species richness - no dispersal',
+'reptilerealbiodiversity':'Reptile species richness',
+'river_floods_ExpDam':'Damage from river flooding',
+'river_floods_PopAff': 'Population affected by river flooding',
+'time_perc_change_SPI48':'',
+'time_perc_change_SPI6':'',
+'time_perc_change_SRI48':'Time change under drought conditions from SRI48',
+'time_perc_change_SRI6':'Time change under drought conditions from SRI6',
+'tn':'Minimum temperature',
+'tx':'Maximum temperature',
+
+}
+
+
+Mapping between {'impact_tag':'Human Readable Impact Tag'}
+
+
+
+Mapping between {'variable_code': 'Human readable description of variable.'}
+
+{
+    'Maize_Irrigation_avoided_perc_change':'Relative (%) change in maize crop yield avoided by irrigation',
+    'Maize_yield_perc_change':'Relative (%) change in maize crop yield',
+    'Rice_Irrigation_avoided_perc_change':'Relative (%) change in rice crop yield avoided by irrigation',
+    'Rice_yield_perc_change':'Relative (%) change in rice crop yield',
+    'Soybeans_Irrigation_avoided_perc_change':'Relative (%) change in soybean crop yield avoided by irrigation',
+    'Soybeans_yield_perc_change':'Relative (%) change in soybean crop yield',
+    'Wheat_Irrigation_avoided_perc_change':'Relative (%) change in wheat crop yield avoided by irrigation',
+    'Wheat_yield_perc_change':'Relative (%) change in wheat crop yield',
+    'amphibianobiodiversity':'Amphibian species richness remaining - no dispersal (%)',
+    'amphibiarealbiodiversity':'Amphibian species richness remaining - real dispersal (%)',
+    'birdnobiodiversity':'Bird species richness remaining - no dispersal (%)',
+    'birdrealbiodiversity':'Bird species richness remaining - real dispersal (%)',
+    'cVeg':'Vegetation biomass (kg m-2)',
+    'gpp':'Gross Primary Productivity (gC m-2 yr-1)',
+    'mammalnobiodiversity':'Mammalian species richness remaining - no dispersal (%)',
+    'mammalrealbiodiversity':'Mammalian species richness remaining - real dispersal (%)',
+    'nbp':'Net Biome productivity (gC m-2 yr-1)',
+    'perc_change_low_roff':'Relative (%) change in 10th percentile runoff production, derived from daily runoff data',
+    'perc_change_roff':'Relative (%) change in mean runoff production, derived from daily runoff data',
+    'pr':'Precipitation (mm)',
+    'reptilenobiodiversity':'Reptile species richness remaining - no dispersal (%)',
+    'reptilerealbiodiversity':'Reptile species richness remaining - real dispersal (%)',
+    'river_floods_ExpDam':'Direct expected damage per year from river flooding in Euros (2010 values) relative to baseline values (average 1976–2005), from multi-model averages based on EC-EARTH r1 to r7.',
+    'river_floods_PopAff':'Number of people affected per year from river flooding relative to baseline values (average 1976–2005), from multi-model averages based on EC-EARTH r1 to r7.',
+    'time_perc_change_SPI48':'Relative (%) change in time under drought conditions, defined as the sum of months with 48-month Standardised Precipitation Index (SPI48) below the value -1.5',
+    'time_perc_change_SPI6':'Relative (%) change in time under drought conditions, defined as the sum of months with 6-month Standardised Precipitation Index (SPI6) below the value -1.5',
+    'time_perc_change_SRI48':'Relative (%) change in time under drought conditions, defined as the sum of months with 48-month Standardised Runoff Index (SRI48) below the value -1.5',
+    'time_perc_change_SRI6':'Relative (%) change in time under drought conditions, defined as the sum of months with 6-month Standardised Runoff Index (SRI6) below the value -1.5',
+    'tn':'Annual minimum temperature (Celsius)',
+    'tx':'Annual maximum temperature (Celsius)',
+}
+
+
+Mapping between impact tag and human readable version for menus: {'impact_tag':'human readable version'}
+
+{
+'bd':'Biodiversity',
+'w':'Water',
+'eco':'Ecosystem',
+'ag':'Agriculture',
+'cl':'Climate',
+}

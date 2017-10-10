@@ -277,7 +277,8 @@ def identify_run(element):
         return None
 
 def combine_processed_results(path='./processed/admin0/',
-                              table_name="./master_admin0.csv"):
+                              table_name="./master_admin0.csv",
+                              drop_szn_mnth=False):
     """Combine all the csv files in the path (e.g. all processed files)
     into a single master table. Add in extra info too like 2character iso codes.
     NOTE: at this point we use a round function to leave only 1 sig fig of data.
@@ -301,10 +302,9 @@ def combine_processed_results(path='./processed/admin0/',
             run_column.append(1)
     master_table['model_taxonomy'] = new_taxa_column
     master_table['run'] =  run_column
-    # iso2 = []
-    # for ccode in master_table.iso:
-    #     iso2.append(countries.get(ccode).alpha2)
-    # master_table['iso2'] = iso2
+    if drop_szn_mnth:
+        master_table = master_table.drop(['is_seasonal','season',
+                                          'is_monthly','month'], axis=1)
     master_table.to_csv(table_name, index=False)
     print("Made {0}: {1:,g} rows of data. {2:,g} sources.".format(table_name,
                                                         len(master_table),

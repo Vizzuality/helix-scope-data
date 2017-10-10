@@ -4,40 +4,39 @@ Mapping between  {'varible_name': 'Human readable variable name'}
 
 {
 'Maize_Irrigation_avoided_perc_change':'Maize yield change avoided by irrigation',
-'Maize_yield_perc_change':'Maize crop yield change',
+'Maize_yield_perc_change':'Maize yield change',
 'Rice_Irrigation_avoided_perc_change':'Rice yield change avoided by irrigation',
-'Rice_yield_perc_change':'Rice crop yield change',
+'Rice_yield_perc_change':'Rice yield change',
 'Soybeans_Irrigation_avoided_perc_change':'Soybeans yield change avoided by irrigation',
-'Soybeans_yield_perc_change':'Soybeans crop yield change',
+'Soybeans_yield_perc_change':'Soybeans yield change',
 'Wheat_Irrigation_avoided_perc_change':'Wheat yield change avoided by irrigation',
-'Wheat_yield_perc_change':'Wheat crop yield change',
+'Wheat_yield_perc_change':'Wheat yield change',
 'amphibianobiodiversity':'Amphibian species richness - no dispersal',
-'amphibiarealbiodiversity':'Amphibian species richness',
+'amphibiarealbiodiversity':'Amphibian species richness - with dispersal',
 'birdnobiodiversity':'Bird species richness - no dispersal',
-'birdrealbiodiversity':'Bird species richness',
+'birdrealbiodiversity':'Bird species richness - with dispersal',
+'evap':'Evapotranspiration',
+'cSoil':"Soil carbon content",
 'cVeg':'Vegetation biomass',
 'gpp':'Gross primary productivity',
 'mammalnobiodiversity':'Mammalian species richness remaining - no dispersal',
-'mammalrealbiodiversity':'Mammalian species richness',
+'mammalrealbiodiversity':'Mammalian species richness - with dispersal',
 'nbp':'Net Biome productivity',
 'perc_change_low_roff':'10th percentile runoff production',
 'perc_change_roff':'Runoff production',
 'pr':'Precipitation',
 'reptilenobiodiversity':'Reptile species richness - no dispersal',
-'reptilerealbiodiversity':'Reptile species richness',
+'reptilerealbiodiversity':'Reptile species richness - with dispersal',
 'river_floods_ExpDam':'Damage from river flooding',
 'river_floods_PopAff': 'Population affected by river flooding',
-'time_perc_change_SPI48':'',
-'time_perc_change_SPI6':'',
+'time_perc_change_SPI48':'Time change under drought conditions, from SPI48',
+'time_perc_change_SPI6':'Time change under drought conditions, from SPI6',
 'time_perc_change_SRI48':'Time change under drought conditions from SRI48',
 'time_perc_change_SRI6':'Time change under drought conditions from SRI6',
-'tn':'Minimum temperature',
-'tx':'Maximum temperature',
-
+'tn':'Average monthly minimum temperature',
+'tx':'Average monthly maximum temperature',
+'ts':"Average monthly temperature",
 }
-
-
-Mapping between {'impact_tag':'Human Readable Impact Tag'}
 
 
 
@@ -45,18 +44,20 @@ Mapping between {'variable_code': 'Human readable description of variable.'}
 
 {
     'Maize_Irrigation_avoided_perc_change':'Relative (%) change in maize crop yield avoided by irrigation',
-    'Maize_yield_perc_change':'Relative (%) change in maize crop yield',
+    'Maize_yield_perc_change':'Relative (%) change in maize yield',
     'Rice_Irrigation_avoided_perc_change':'Relative (%) change in rice crop yield avoided by irrigation',
-    'Rice_yield_perc_change':'Relative (%) change in rice crop yield',
+    'Rice_yield_perc_change':'Relative (%) change in rice yield',
     'Soybeans_Irrigation_avoided_perc_change':'Relative (%) change in soybean crop yield avoided by irrigation',
-    'Soybeans_yield_perc_change':'Relative (%) change in soybean crop yield',
+    'Soybeans_yield_perc_change':'Relative (%) change in soybean yield',
     'Wheat_Irrigation_avoided_perc_change':'Relative (%) change in wheat crop yield avoided by irrigation',
-    'Wheat_yield_perc_change':'Relative (%) change in wheat crop yield',
+    'Wheat_yield_perc_change':'Relative (%) change in wheat yield',
     'amphibianobiodiversity':'Amphibian species richness remaining - no dispersal (%)',
     'amphibiarealbiodiversity':'Amphibian species richness remaining - real dispersal (%)',
     'birdnobiodiversity':'Bird species richness remaining - no dispersal (%)',
     'birdrealbiodiversity':'Bird species richness remaining - real dispersal (%)',
+    'cSoil':"Soil carbon content (kg m-2)",
     'cVeg':'Vegetation biomass (kg m-2)',
+    'evap':'Evapotranspiration (kg m-2 yr-1)',
     'gpp':'Gross Primary Productivity (gC m-2 yr-1)',
     'mammalnobiodiversity':'Mammalian species richness remaining - no dispersal (%)',
     'mammalrealbiodiversity':'Mammalian species richness remaining - real dispersal (%)',
@@ -72,10 +73,10 @@ Mapping between {'variable_code': 'Human readable description of variable.'}
     'time_perc_change_SPI6':'Relative (%) change in time under drought conditions, defined as the sum of months with 6-month Standardised Precipitation Index (SPI6) below the value -1.5',
     'time_perc_change_SRI48':'Relative (%) change in time under drought conditions, defined as the sum of months with 48-month Standardised Runoff Index (SRI48) below the value -1.5',
     'time_perc_change_SRI6':'Relative (%) change in time under drought conditions, defined as the sum of months with 6-month Standardised Runoff Index (SRI6) below the value -1.5',
-    'tn':'Annual minimum temperature (Celsius)',
-    'tx':'Annual maximum temperature (Celsius)',
+    'tn':'Annual average minimum temperature (Celsius)',
+    'ts':"Annual average temperature (Celsius)",
+    'tx':'Annual average maximum temperature (Celsius)',
 }
-
 
 Mapping between impact tag and human readable version for menus: {'impact_tag':'human readable version'}
 

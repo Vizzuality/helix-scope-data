@@ -3,7 +3,10 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Vizzuality/sql2gee/blob/develop/LICENSE)
 
 
-This repo is the data processing component of Vizzuality’s [HELIX project](https://github.com/Vizzuality/helix-scope)
+This repo contains both the data processing component of the [HELIX project](https://github.com/Vizzuality/helix-scope) and the [developer notes](https://github.com/Vizzuality/helix-scope-data/blob/master/work/backend_examples.ipynb).
+
+
+### Introduction
 
 The data science environment and tools are based on Vizzuality's Data Science [Jupyter Notebooks](https://github.com/Vizzuality/data_sci_tutorials)
 

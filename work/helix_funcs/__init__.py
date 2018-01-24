@@ -143,7 +143,9 @@ def get_shape_attributes(i, shps, shape_id):
     'admin_0', 'admin_1')
     """
     d = {}
-    if shape_id == 'grids10' or shape_id == 'grids5':
+    if shape_id == 'rawgrid':
+        return d{'id_val': shps['id'][i]}
+    elif shape_id == 'grids10' or shape_id == 'grids5':
         keys = ['id_val']
         hack_d = {'id_val': 'shape_id'}
     elif shape_id == 'admin_0':

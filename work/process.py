@@ -23,8 +23,11 @@ def chunks(l, n):
 # Gridded (10x10 degree) land-intersected shapes
 #s = gpd.read_file("./data/sanitized_grid/sanitized_grid.shp")
 
-# Gridded (5x5 degree) land intersected shapes
-s = gpd.read_file("./data/good_five_grid/good_five_grid.shp")
+# Gridded (5x5 degree) land intersected shapes - use 'grids5' argument
+#s = gpd.read_file("./data/good_five_grid/good_five_grid.shp")
+
+# RAW GRID - not assigned to any land-intersected shp(use 'rawgrid' argument)
+s = gpd.read_file("./data/raw_grid/raw_grid.shp")
 
 s = s.to_crs(epsg='4326')
 d = helix_funcs.identify_netcdf_and_csv_files()
@@ -32,7 +35,7 @@ fs = d.get('nc')  # Simply break this list by the number of avilable processors
 
 if __name__ == "__main__":
     start = time.time()
-    processes= [Process(target=helix_funcs.process_file, args=(f, s, 'grids5'),
+    processes= [Process(target=helix_funcs.process_file, args=(f, s, 'rawgrid'),
                         kwargs={'verbose': True,}) for f in fs]
     for process_chunk in chunks(processes, cpu_count()):
         print('loop ', process_chunk, ' of ', cpu_count())

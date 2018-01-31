@@ -144,8 +144,8 @@ def get_shape_attributes(i, shps, shape_id):
     """
     d = {}
     if shape_id == 'rawgrid':
-        return d{'id_val': shps['id'][i]}
-    elif shape_id == 'grids10' or shape_id == 'grids5':
+        return {'id_val': shps['id'][i]}
+    elif shape_id == 'grids1' or shape_id == 'grids5':
         keys = ['id_val']
         hack_d = {'id_val': 'shape_id'}
     elif shape_id == 'admin_0':
@@ -174,9 +174,9 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
     "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
     Note: admin0 tables should have aggregated stats, while admin1 tables should
     only contain means.
-    shape_id can be 'admin_0', 'admin_1', 'grids10', 'grids5'
+    shape_id can be 'admin_0', 'admin_1', 'grids1', 'grids5'
     """
-    valid_shapes = ['admin_0', 'admin_1', 'grids10', 'grids5']
+    valid_shapes = ['admin_0', 'admin_1', 'grids1', 'grids5']
     if skip_monthly:
         suffix_item = file.split('/')[-1].split('.')[-2]
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -194,8 +194,8 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
                         'To process set skip_seasonal to False')
             if verbose: print(file, warning)
             return None
-    if shape_id == 'grids10':
-        admin_prefix = 'grids10/'
+    if shape_id == 'grids1':
+        admin_prefix = 'grids1/'
         if verbose: print('working on ', admin_prefix)
     elif shape_id == 'grids5':
         admin_prefix = 'grids5/'
@@ -215,7 +215,7 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
         return
     else:
         if verbose: print("Processing '{}'".format(file))
-        if shape_id == 'grids10' or shape_id == 'grids5':
+        if shape_id == 'grids1' or shape_id == 'grids5':
             keys = ['shape_id', 'variable','swl_info','count', 'max','min',
                     'mean','std','impact_tag','institution','model_long_name',
                     'model_short_name','model_taxonomy',

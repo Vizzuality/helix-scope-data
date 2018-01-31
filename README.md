@@ -115,7 +115,7 @@ helix_funcs.combine_processed_results('./work/processed'
 
 ## Data sources
 
-Unfortunately, this project mixes data from a variety of sources. The majority of
+This project mixes data from a variety of sources. The majority of
 the data are netcdf format, however we also have csv files (e.g. UEA for agriculture)
 and Excel workbooks (population data). We will need to process all of these data sources
 and create a standardised output (one that shares the same structure) prior to generating
@@ -128,4 +128,30 @@ file.
 
 Warning:
 * These files mix zeros and NA values.
-* They have inconsistent column names between files.        
+* They have inconsistent column names between files.
+
+### Shapefiles
+
+Except for the admin0 level table, the
+majority of this project depends on intersecting
+shapes with a raster (from netcdf)
+of data. These shapes need to be custom
+generated:
+
+#### Procedure for creating gridded shapefiles
+
+Start with polygons of the global land:
+    Source [Natural Earth 50m Land polygons](http://www.naturalearthdata.com/downloads/50m-physical-vectors/)
+
+Load the Natural Earth Polygons in QGis.
+
+In [QGis](https://qgis.org/en/site/), create a Vector Grid that overlays the polygons at your
+desired resolution. `Vector > Research Tools > Vector Grid`
+
+At this point, the grid should overlay the land polygons.
+
+Finally, run an intersect algorithm: e.g. `Vector > Geometry processing tools > Intersect`
+(Depending on the shape size and complexity this may take some time.)
+
+Finally, before uploading to carto you may need to alter the auto-generated `id` values. The field `id` will not parse. We have been
+using Geopandas to extract the geometries and add a new index column called `id_vals`.

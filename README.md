@@ -153,5 +153,11 @@ At this point, the grid should overlay the land polygons.
 Finally, run an intersect algorithm: e.g. `Vector > Geometry processing tools > Intersect`
 (Depending on the shape size and complexity this may take some time.)
 
-Finally, before uploading to carto you may need to alter the auto-generated `id` values. The field `id` will not parse. We have been
-using Geopandas to extract the geometries and add a new index column called `id_vals`.
+Finally, before uploading to carto and using as the shapefile resource,
+ you need to alter the auto-generated `id` values, for two reasons:
+ 1. The field `id` will not parse. We have been
+    using Geopandas to extract the geometries and add a new index column called `id_vals`.
+ 2. You will need to associate each shape with the id of the original (non-intersected) grid.
+    As the original grid should also be the input data to the processing pipeline.
+    Therefore the shapes will need to bear the id number of the grid they intersect with.
+    (And thus `id_val` may not necessarily be unique.)

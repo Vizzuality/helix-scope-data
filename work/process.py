@@ -10,27 +10,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-# ------------- FOR NOW SET HERE THE SHAPEFILE TO PROCESS AND CHANGE argument--
-# e.g. processes= [Process(target=helix_funcs.process_file, args=(f, s, 'grids'),
-#                                                   0 above for admin-0 ^
-
-# ADMIN 0 LEVEL (unsimplifed country shapes)
-#s = gpd.read_file('./data/gadm28_countries/gadm28_countries.shp')
-
-# SIMPLIFIED SHAPES FOR ADMIN 1 LEVEL
-#s = gpd.read_file("./data/gadm28_adm1_simplified/gadm28_adm1_simplified.shp")
-
-# Gridded (10x10 degree) land-intersected shapes
-#s = gpd.read_file("./data/sanitized_grid/sanitized_grid.shp")
-
-# Gridded (5x5 degree) land intersected shapes - use 'grids5' argument
-#s = gpd.read_file("./data/good_five_grid/good_five_grid.shp")
-
-# RAW GRID - not assigned to any land-intersected shp(use 'rawgrid' argument)
-#s = gpd.read_file("./data/raw_grid/raw_grid.shp")
 s = "./data/OneDegInterMod/OneDegInterMod.shp"
-
-s = s.to_crs(epsg='4326')
 d = helix_funcs.identify_netcdf_and_csv_files()
 fs = d.get('nc')  # Simply break this list by the number of avilable processors
 

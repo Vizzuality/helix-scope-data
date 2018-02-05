@@ -135,7 +135,8 @@ def get_nc_attributes(filepath):
         d.update({nc_attr: nc_file.getncattr(nc_attr)})
     return d
 
-
+# note the below function needs to be re-written following the code update
+# as we need to extract the admin level shape attributes at a new point now.
 def get_shape_attributes(i, shps, shape_id):
     """Get attributes of shapes for gadm28_admin1 data
     index (i) should be passed.
@@ -143,7 +144,9 @@ def get_shape_attributes(i, shps, shape_id):
     'admin_0', 'admin_1')
     """
     d = {}
-    if shape_id == 'grids10' or shape_id == 'grids5':
+    if shape_id == 'rawgrid':
+        return {'id_val': shps['id'][i]}
+    elif shape_id == 'grids1' or shape_id == 'grids5':
         keys = ['id_val']
         hack_d = {'id_val': 'shape_id'}
     elif shape_id == 'admin_0':
@@ -172,9 +175,9 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
     "data/CNRS_data/cSoil/orchidee-giss-ecearth.SWL_15.eco.cSoil.nc"
     Note: admin0 tables should have aggregated stats, while admin1 tables should
     only contain means.
-    shape_id can be 'admin_0', 'admin_1', 'grids10', 'grids5'
+    shape_id can be 'admin_0', 'admin_1', 'grids1', 'grids5'
     """
-    valid_shapes = ['admin_0', 'admin_1', 'grids10', 'grids5']
+    valid_shapes = ['admin_0', 'admin_1', 'grids1', 'grids5']
     if skip_monthly:
         suffix_item = file.split('/')[-1].split('.')[-2]
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -192,8 +195,8 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
                         'To process set skip_seasonal to False')
             if verbose: print(file, warning)
             return None
-    if shape_id == 'grids10':
-        admin_prefix = 'grids10/'
+    if shape_id == 'grids1':
+        admin_prefix = 'grids1/'
         if verbose: print('working on ', admin_prefix)
     elif shape_id == 'grids5':
         admin_prefix = 'grids5/'
@@ -213,7 +216,7 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
         return
     else:
         if verbose: print("Processing '{}'".format(file))
-        if shape_id == 'grids10' or shape_id == 'grids5':
+        if shape_id in ['grids1','grids5']:
             keys = ['shape_id', 'variable','swl_info','count', 'max','min',
                     'mean','std','impact_tag','institution','model_long_name',
                     'model_short_name','model_taxonomy',
@@ -237,23 +240,14 @@ def process_file(file, shps, shape_id, verbose=False, overwrite=False,
         else:
             raise ValueError('shape_id should be one of ', valid_shapes)
         tmp_metadata = generate_metadata(file)
-        with rasterio.open(file) as nc_file:
-            rast=nc_file.read()
-            properties = nc_file.profile
-        tmp = rast[0,:,:]
-        mask = tmp == properties.get('nodata')
-        tmp[mask] = np.nan
+        geo_df = gpd.read_file(shps)
+        shape_ids = geo_df['id_val'].values
         stats_per_file = []
-        for i in shps.index:
-            shp = shps.iloc[i].geometry
-            zstats = zonal_stats(shp, tmp, band=1,
-                                 stats=stats_to_get,
-                                 all_touched=True, raster_out=False,
-                                 affine=properties['transform'],
-                                 no_data=np.nan)
-            if zstats[0].get('count', 0) > 0:
-                shp_atts = get_shape_attributes(i, shps=shps, shape_id=shape_id)
-                tmp_d = {**zstats[0], **shp_atts, **tmp_metadata}
+        zstats = zonal_stats(shps, file,
+                     stats=stats_to_get)
+        for n, row in enumerate(zstats):
+            if row.get('count', 0) > 0:
+                tmp_d = {**row, **tmp_metadata, 'shape_id': shape_ids[n]}
                 stats_per_file.append([tmp_d.get(key, None) for key in keys])
         df = pd.DataFrame(stats_per_file, columns=keys)
         path_check = "/".join(output_filename.split("/")[0:-1])
